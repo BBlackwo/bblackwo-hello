@@ -1,0 +1,23 @@
+{
+  "name": "@bblackwo/hello",
+  "version": "1.0.0",
+  "description": "Hello. A package for testing NPM publishing.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BBlackwo/bblackwo-hello.git"
+  },
+  "keywords": [
+    "hello",
+    "publishing"
+  ],
+  "author": "Benjamin Blackwood",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BBlackwo/bblackwo-hello/issues"
+  },
+  "homepage": "https://github.com/BBlackwo/bblackwo-hello#readme"
+}
