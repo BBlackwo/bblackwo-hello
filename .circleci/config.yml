@@ -1,7 +1,27 @@
 version: 2.1
+
 orbs:
   node: circleci/node@3.0.0
+
+jobs: 
+  deploy:
+    steps:
+      - run:
+          name: Authenticate with registry
+          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/.npmrc
+      - run:
+          name: Publish package
+          command: npm publish 
+
 workflows:
   node-tests:
     jobs:
       - node/test
+      - deploy:
+          requires:
+            - node/test
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              only: master
