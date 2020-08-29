@@ -46,7 +46,8 @@ jobs:
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/repo/.npmrc
       - run:
           name: Publish package
-          command: npm publish
+          # by default scoped packages are private
+          command: npm publish --access public
 
 workflows:
   version: 2
