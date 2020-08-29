@@ -22,5 +22,8 @@
   "homepage": "https://github.com/BBlackwo/bblackwo-hello#readme",
   "dependencies": {
     "cowsay": "^1.4.0"
+  },
+  "devDependencies": {
+    "semantic-release": "^17.1.1"
   }
 }
