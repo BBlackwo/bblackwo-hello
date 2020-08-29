@@ -12,30 +12,51 @@ defaults: &defaults
     - image: circleci/node:12.18
 
 jobs:
-  test:
+  setup:
     <<: *defaults
     steps:
       - checkout
 
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-{{ checksum "package-lock.json" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
       - run: npm install
-      - run:
-          name: Run tests
-          command: npm test
 
       - save_cache:
           paths:
             - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+          key: v1-dependencies-{{ checksum "package-lock.json" }}
 
       - persist_to_workspace:
           root: ~/repo
           paths: .
+
+  lint_commit_message:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Define environment variable with latest commit's message
+          command: |
+            echo 'export COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")' >> $BASH_ENV
+            source $BASH_ENV
+      - run:
+          name: Lint commit message
+          command: echo "$COMMIT_MESSAGE" | npx commitlint
+
+  test:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Run tests
+          command: npm test
+
   deploy:
     <<: *defaults
     steps:
@@ -47,7 +68,9 @@ workflows:
   version: 2
   test-deploy:
     jobs:
-      - test
+      - setup
+      - lint_commit_message: { requires: [setup] }
+      - test: { requires: [lint_commit_message] }
       - deploy:
           requires:
             - test
@@ -56,3 +79,5 @@ workflows:
               only: /^v.*/
             branches:
               only: master
+              # Ignore forked pull requests have CIRCLE_BRANCH set to pull/XXX
+              ignore: /pull\/[0-9]+/
