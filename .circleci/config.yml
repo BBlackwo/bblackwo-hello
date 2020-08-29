@@ -12,7 +12,7 @@ defaults: &defaults
     - image: circleci/node:12.18
 
 jobs:
-  setup:
+  setup-lint-test:
     <<: *defaults
     steps:
       - checkout
@@ -25,20 +25,6 @@ jobs:
 
       - run: npm install
 
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package-lock.json" }}
-
-      - persist_to_workspace:
-          root: ~/repo
-          paths: .
-
-  lint_commit_message:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/repo
       - run:
           name: Define environment variable with latest commit's message
           command: |
@@ -48,14 +34,18 @@ jobs:
           name: Lint commit message
           command: echo "$COMMIT_MESSAGE" | npx commitlint
 
-  test:
-    <<: *defaults
-    steps:
-      - attach_workspace:
-          at: ~/repo
       - run:
           name: Run tests
           command: npm test
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package-lock.json" }}
+
+      - persist_to_workspace:
+          root: ~/repo
+          paths: [.]
 
   deploy:
     <<: *defaults
@@ -68,12 +58,10 @@ workflows:
   version: 2
   test-deploy:
     jobs:
-      - setup
-      - lint_commit_message: { requires: [setup] }
-      - test: { requires: [lint_commit_message] }
+      - setup-lint-test
       - deploy:
           requires:
-            - test
+            - setup-lint-test
           filters:
             tags:
               only: /^v.*/
