@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/BBlackwo/bblackwo-hello/issues"
   },
-  "homepage": "https://github.com/BBlackwo/bblackwo-hello#readme"
+  "homepage": "https://github.com/BBlackwo/bblackwo-hello#readme",
+  "dependencies": {
+    "cowsay": "^1.4.0"
+  }
 }
