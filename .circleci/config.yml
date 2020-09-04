@@ -1,9 +1,6 @@
 # Javascript Node CircleCI 2.0 configuration file
-#
 # Check {{ '/2.0/language-javascript/' | docs_url }} for more details
-#
 # Via: https://circleci.com/blog/publishing-npm-packages-using-circleci-2-0/
-#
 version: 2
 
 defaults: &defaults
@@ -12,7 +9,7 @@ defaults: &defaults
     - image: circleci/node:12.18
 
 jobs:
-  setup-lint-test:
+  install-lint-test:
     <<: *defaults
     steps:
       - checkout
@@ -26,17 +23,16 @@ jobs:
       - run: npm install
 
       - run:
-          name: Define environment variable with latest commit's message
+          name: Define environment variable with latest commit message
           command: |
             echo 'export COMMIT_MESSAGE=$(git log -1 --pretty=format:"%s")' >> $BASH_ENV
             source $BASH_ENV
+      
       - run:
           name: Lint commit message
           command: echo "$COMMIT_MESSAGE" | npx commitlint
 
-      - run:
-          name: Run tests
-          command: npm test
+      - run: npm test
 
       - save_cache:
           paths:
@@ -58,10 +54,9 @@ workflows:
   version: 2
   test-deploy:
     jobs:
-      - setup-lint-test
+      - install-lint-test
       - deploy:
-          requires:
-            - setup-lint-test
+          requires: [install-lint-test]
           filters:
             tags:
               only: /^v.*/
