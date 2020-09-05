@@ -2,9 +2,11 @@
   "name": "@bblackwo/hello",
   "version": "1.0.0",
   "description": "Hello. A package for testing NPM publishing.",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "test": "node ."
+    "pretest": "npm run lint",
+    "test": "node .",
+    "lint": "eslint . --cache --fix"
   },
   "repository": {
     "type": "git",
@@ -26,7 +28,18 @@
   "devDependencies": {
     "@commitlint/cli": "^10.0.0",
     "@commitlint/config-conventional": "^10.0.0",
+    "eslint": "^7.8.1",
     "husky": "^4.2.5",
+    "lint-staged": "^10.3.0",
     "semantic-release": "^17.1.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "*.js": "eslint --cache --fix"
   }
 }
